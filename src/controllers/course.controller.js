@@ -17,11 +17,7 @@ exports.list = async(req, res) => {
   console.log(courses);
   console.log(courses.map(course => course.id));
 
-  
   const userCourses = await db.UserCourse.findAll({where: {userId: userId, courseId: {$in: [4,5]} }})
-
-  console.log('-0--');
-  console.log(userCourses);
 
   const _courses = courses.map(course => {
     userCourse = userCourses.find(userCourse => userCourse.courseId === course.id)    
