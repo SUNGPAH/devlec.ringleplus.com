@@ -1,0 +1,23 @@
+{
+  "development": {
+    "host": "lecturetest.cbmxpnuzldys.ap-northeast-2.rds.amazonaws.com",
+    "username": "ringle",
+    "password": "fldrmf1!",
+    "database": "lecturetest",
+    "dialect": "mysql"
+  },
+  "test": {
+    "host": "lecturetest.cbmxpnuzldys.ap-northeast-2.rds.amazonaws.com",
+    "username": "ringle",
+    "password": "fldrmf1!",
+    "database": "lecturetest",
+    "dialect": "mysql"
+  },
+  "production": {
+    "host": "lecturetest.cbmxpnuzldys.ap-northeast-2.rds.amazonaws.com",
+    "username": "ringle",
+    "password": "fldrmf1!",
+    "database": "lecturetest",
+    "dialect": "mysql"
+  }
+}
