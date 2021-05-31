@@ -14,11 +14,7 @@ exports.list = async(req, res) => {
     return
   }
 
-  console.log(courses);
-  console.log(courses.map(course => course.id));
-
   const userCourses = await db.UserCourse.findAll({where: {userId: userId, courseId: {$in: [4,5]} }})
-
   const _courses = courses.map(course => {
     userCourse = userCourses.find(userCourse => userCourse.courseId === course.id)    
     course.userCourse = userCourse
@@ -30,29 +26,25 @@ exports.list = async(req, res) => {
 }
 
 exports.get = async(req,res) => {
-
-  const course = await db.UserCourse.findOne({})
-  res.send({success: true, course: course})
-
-  // const userId = 1
-  // const courseId = req.params.courseId
-  // const course = await db.Course.findOne({raw:true, where:{id: courseId}})
-  // const userCourse = await db.UserCourse.findOne({where: userId, courseId: courseId})
+  const userId = 1
+  const courseId = req.params.courseId
+  const course = await db.Course.findOne({raw:true, where:{id: courseId}})
+  const userCourse = await db.UserCourse.findOne({where: userId, courseId: courseId})
   
-  // const courseClips = await db.CourseClip.findAll({raw: true, where: {courseId: courseId}})
-  // const userCourseClips = await db.UserCourseClip.findAll({where: {
-  //   courseClipId: courseClips.map(courseClip => courseClip.id),
-  //   userId: userId
-  // }})
+  const courseClips = await db.CourseClip.findAll({raw: true, where: {courseId: courseId}})
+  const userCourseClips = await db.UserCourseClip.findAll({where: {
+    courseClipId: courseClips.map(courseClip => courseClip.id),
+    userId: userId
+  }})
   
-  // const _courseClips = courseClips.map(courseClip => {
-  //   const userCourseClip = userCourseClips.find(ucc => ucc.courseCliipId === courseClip.id)
-  //   courseClip.userCourseClip = userCourseClip
+  const _courseClips = courseClips.map(courseClip => {
+    const userCourseClip = userCourseClips.find(ucc => ucc.courseCliipId === courseClip.id)
+    courseClip.userCourseClip = userCourseClip
     
-  //   return courseClip
-  // })
+    return courseClip
+  })
   
-  // res.send({success: true, courseClips: _courseClips })
+  res.send({success: true, courseClips: _courseClips })
 }
 
 exports.add = async(req,res) => {
@@ -63,41 +55,58 @@ exports.add = async(req,res) => {
   }
 
   const course = await db.Course.create(payload)
-  
   res.send({success: true, course: course })  
 }
 
+exports.modify = async(req,res) => {
+  const payload = {
+    title: "do somthing here..",
+    imgUrl: 'asdfasdf',
+  }
 
-  // //2. modify
-  // app.get('/modifyCourse/:courseId', async(req, res) => {
-  //   const payload = {
-  //     title: "do somthing here..",
-  //     imgUrl: 'asdfasdf',
-  //   }
+  const course = await db.Course.findOne({where: {id: req.params.courseId}})
+  if(!course){
+    res.send({success: false, message: 'no course'})  
+  }
 
-  //   const course = await db.Course.findOne({where: {id: req.params.courseId}})
+  Object.keys(payload).forEach((key,index) => {
+    course[key] = payload[key]
+  })  
 
-  //   Object.keys(payload).forEach((key,index) => {
-  //     course[key] = payload[key]
-  //   })  
+  await course.save();
 
-  //   await course.save();
+  res.send({success: true, course: course})
+}
 
-  //   res.send({success: true, course: course })
-  // }); 
+exports.remove = async(req,res) => {
+  const course = await db.Course.findOne({where: {id: req.params.courseId}})
 
-  // app.get('/removeCourse/:courseId', async(req, res) => {
-  //   const payload = {
-  //     title: "do somthing here..",
-  //     imgUrl: 'asdfasdf',
-  //   }
-
-  //   const course = await db.Course.findOne({where: {id: req.params.courseId}})
-
-  //   if(course){
-  //     await course.destroy();
-  //     res.send({success: true})
-  //   }else{
-  //     res.send({success: true, message: "already deleted"})
-  //   }
-  // }); 
+  if(course){
+    await course.destroy();
+    res.send({success: true})
+  }else{
+    res.send({success: true, message: "already deleted"})
+  }
+}
+exports.getCourseDetail = async(req,res) => {
+  const userId = 1
+  const courseId = req.params.courseId
+  const course = await db.Course.findOne({raw:true, where:{id: courseId}})
+  const userCourse = await db.UserCourse.findOne({where: userId, courseId: courseId})
+  
+  //course정보 -> clip까지 모두다...
+  const courseClips = await db.CourseClip.findAll({raw: true, where: {courseId: courseId}})
+  const userCourseClips = await db.UserCourseClip.findAll({where: {
+    courseClipId: courseClips.map(courseClip => courseClip.id),
+    userId: userId
+  }})
+  
+  const _courseClips = courseClips.map(courseClip => {
+    const userCourseClip = userCourseClips.find(ucc => ucc.courseCliipId === courseClip.id)
+    courseClip.userCourseClip = userCourseClip
+    
+    return courseClip
+  })
+  
+  res.send({success: true, courseClips: _courseClips })
+}
