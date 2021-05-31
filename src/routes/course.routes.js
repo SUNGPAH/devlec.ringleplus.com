@@ -6,6 +6,7 @@ module.exports = function(app) {
 
   router.get("/list", course.list);
   router.get("/get/:courseId", course.get)
+  router.get("/add", course.add)
 
 
   app.use('/api/course', router);
