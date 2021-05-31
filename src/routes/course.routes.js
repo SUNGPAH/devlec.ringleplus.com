@@ -2,9 +2,14 @@
 module.exports = function(app) {
 
   var router = require("express").Router();
+  const course = require("../controllers/course.controller.js");
 
   router.get("/list", course.list);
   router.get("/get/:courseId", course.get)
+
+
+  app.use('/api/course', router);
+
 
   // router.get("/list", document.list);
   // router.get("/abstract/:uuid", document.abstract);
