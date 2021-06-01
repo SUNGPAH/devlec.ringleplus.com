@@ -13,12 +13,14 @@ exports.get = async(req, res) => {
 
 exports.add = async(req, res) => {
   const courseId = req.body.courseId
-  const payload = {
-    courseId: courseId,
-    title: req.body.title,
-    description: req.body.description,
-    documentUrl: req.body.documentUrl
-  }
+  // const payload = {
+  //   courseId: courseId,
+  //   title: req.body.title,
+  //   description: req.body.description,
+  //   documentUrl: req.body.documentUrl
+  // }
+
+  const payload = req.body 
 
   const courseClip = await db.CourseClip.create(payload)
   res.send({success: true, courseClip: courseClip })
@@ -41,8 +43,10 @@ exports.modify = async(req, res) => {
   const courseClip = await db.CourseClip.findOne({where: {id: courseClipId}})
 
   // const payload = {title: "이거로 수정해보자."}
-  const payload = req.body.payload; //이게 뭐 이터레이션이 도는거지뭐
+  const payload = req.body; //이게 뭐 이터레이션이 도는거지뭐
 
+  console.log('what is payload..?');
+  console.log(payload);
   // const key = "title"
   // courseClip[key] = "asdfasdf"
 

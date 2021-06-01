@@ -20,6 +20,8 @@ module.exports = (sequelize, DataTypes) => {
     totalEstimatedMin: DataTypes.INTEGER,
     programType: DataTypes.STRING,
     courseOrder: DataTypes.INTEGER,
+    preparation: DataTypes.STRING,
+    learning: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Course',
