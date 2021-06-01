@@ -1,16 +1,19 @@
 const db = require("../../models");
 const config = require("../../config/auth.config");
 const Role = db.role;
-const User = db.user;
+const User = db.User;
 const Op = db.Sequelize.Op;
 
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
+exports.list = async (req,res) => {
+  const users = await User.findAll();
+
+  res.send({success: true, users: users})
+
+}
 exports.signup = (req, res) => {
-  //validation check..!
-  //User - username
-  //req.body.username
   console.log("executed")
   const usernameCheck = User.findAll({where: {username: req.body.username}})
   const emailCheck = User.findOne({where: {email: req.body.email}})
@@ -23,53 +26,24 @@ exports.signup = (req, res) => {
     return;
   }
   //유저 생성
+
   User.create({
     username: req.body.username,
     email: req.body.email,
     password: bcrypt.hashSync(req.body.password, 8)
   })
   .then(user => {
-    if (req.body.roles) {
-      Role.findAll({
-        where: {
-          name: {
-            [Op.or]: req.body.roles
-          }
-        }
-      }).then(roles => {
-        user.setRoles(roles).then(() => {
-          
-          var token = jwt.sign({ id: user.id }, config.secret, {
-            expiresIn: 86400 // 24 hours //ha!
-          });
+  
+    var token = jwt.sign({ id: user.id }, config.secret, {
+      expiresIn: 86400 // 24 hours //ha!
+    });
 
-          res.send({ 
-            message: "User was registered successfully!", 
-            user: user,
-            accessToken: token, 
-            success: true
-          });
-
-        });
-      });
-    } else {
-      // user role = 1
-      user.setRoles([1]).then(() => {
-        // res.send({ message: "User was registered successfully!" });
-
-        var token = jwt.sign({ id: user.id }, config.secret, {
-          expiresIn: 86400 // 24 hours //ha!
-        });
-
-        res.send({ 
-          message: "User was registered successfully!", 
-          user: user,
-          accessToken: token, 
-          success: true
-        });
-
-      });
-    }
+    res.send({ 
+      message: "User was registered successfully!", 
+      user: user,
+      accessToken: token, 
+      success: true
+    });
   })
   .catch(err => {
     res.status(500).send({ message: err.message });
@@ -102,23 +76,15 @@ exports.signin = (req, res) => {
       var token = jwt.sign({ id: user.id }, config.secret, {
         expiresIn: 86400 // 24 hours
       });
-
-      var authorities = [];
-      user.getRoles().then(roles => {
-        for (let i = 0; i < roles.length; i++) {
-          authorities.push("ROLE_" + roles[i].name.toUpperCase());
+      
+      res.status(200).send({
+        success: true,
+        user: {
+          id: user.id,
+          username: user.username,
+          email: user.email,
+          accessToken: token
         }
-        res.status(200).send({
-          success: true,
-          user: {
-            id: user.id,
-            username: user.username,
-            email: user.email,
-            imgUrl: user.imgUrl,
-            roles: authorities,
-            accessToken: token
-          }
-        });
       });
     })
     .catch(err => {
