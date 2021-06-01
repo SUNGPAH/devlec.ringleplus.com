@@ -6,8 +6,8 @@ module.exports = function(app) {
 
   // router.get("/list", courseClip.list);
   router.get("/get/:courseClipId", courseClip.get)
-  router.get("/modify/:courseClipId", courseClip.modify)
-  router.get("/remove/:courseClipId", courseClip.remove)
-  router.get("/add", courseClip.add)
+  router.post("/modify/:courseClipId", courseClip.modify)
+  router.post("/remove/:courseClipId", courseClip.remove)
+  router.post("/add", courseClip.add)
   app.use('/api/courseClip', router);
 }
