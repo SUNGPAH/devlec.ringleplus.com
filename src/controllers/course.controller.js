@@ -5,11 +5,13 @@ const jwtHelper = require("../lib/jwtHelper");
 const Comment = db.comment 
 
 exports.list = async(req, res) => {
+
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
   
-  const type = "Client"
-  const courses = await db.Course.findAll({raw:true, where: {programType: type}, order: [['courseOrder', 'ASC']]})
+  const programType = "Client"
+  // const programType = req.params.programType;
+  const courses = await db.Course.findAll({raw:true, where: {programType: programType}, order: [['courseOrder', 'ASC']]})
 
   if (courses.length === 0){
     res.json({success: false})
@@ -36,7 +38,8 @@ exports.get = async(req,res) => {
   const userId = decoded.userId;
   const courseId = parseInt(req.params.courseId)
   const courseClips = await db.CourseClip.findAll({raw: true, where: {courseId: courseId}})
-  
+  const course = await db.Course.findOne({where: {id: courseId}})
+
   if(userId) {
     const userCourseClips = await db.UserCourseClip.findAll({where: {
       courseClipId: courseClips.map(courseClip => courseClip.id),
@@ -49,10 +52,10 @@ exports.get = async(req,res) => {
       
       return courseClip
     })  
-    res.send({success: true, courseClips: _courseClips })
+    res.send({success: true, courseClips: _courseClips, course: course })
 
   }else{
-    res.send({success: true, courseClips: courseClips})
+    res.send({success: true, courseClips: courseClips, course: course })
   }
   
 }
@@ -74,11 +77,14 @@ exports.modify = async(req,res) => {
   //   title: "do somthing here..",
   //   imgUrl: 'asdfasdf',
   // }
-  const payload = req.body.payload
+  const payload = req.body
   const course = await db.Course.findOne({where: {id: req.params.courseId}})
   if(!course){
     res.send({success: false, message: 'no course'})  
+    return
   }
+
+  console.log(payload);
 
   Object.keys(payload).forEach((key,index) => {
     course[key] = payload[key]

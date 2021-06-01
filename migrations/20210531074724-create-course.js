@@ -28,7 +28,7 @@ module.exports = {
         }
       },
       courseOrder: {
-        type: Sequelize.JSON
+        type: Sequelize.INTEGER
       },
       courseClip: {
         type: Sequelize.JSON 
