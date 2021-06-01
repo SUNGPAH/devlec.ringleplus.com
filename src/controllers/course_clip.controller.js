@@ -12,11 +12,11 @@ exports.get = async(req, res) => {
 }
 
 exports.add = async(req, res) => {
-  const courseId = 1
+  const courseId = req.body.courseId
   const payload = {
     courseId: courseId,
-    title: "brbrbnr",
-    documentUrl: "brbrbr",
+    title: req.body.title,
+    documentUrl: req.body.documentUrl
   }
 
   const courseClip = await db.CourseClip.create(payload)
@@ -38,10 +38,16 @@ exports.modify = async(req, res) => {
   const courseClipId = req.params.courseClipId
   
   const courseClip = await db.CourseClip.findOne({where: {id: courseClipId}})
-  const payload = {title: "이거로 수정해보자."}
 
-  const key = "title"
-  courseClip[key] = "asdfasdf"
+  // const payload = {title: "이거로 수정해보자."}
+  const payload = req.body.payload; //이게 뭐 이터레이션이 도는거지뭐
+
+  // const key = "title"
+  // courseClip[key] = "asdfasdf"
+
+  Object.keys(payload).forEach((key,index) => {
+    courseClip[key] = payload[key]
+  })  
 
 
   await courseClip.save()

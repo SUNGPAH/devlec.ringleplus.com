@@ -24,23 +24,5 @@ app.get("/", async(req, res) => {
   res.json({message: "Welcome", firstUser: user})
 })
 
-/*
-1. get all courses under of "client" or "server" or "dev-ops" or "full-stack"
-  - with user's records
-  - done..
-
-2. landing API 
-  - upcoming study, past study
-
-4. get comments with courseClipId 
-
-5. submit comment 
-6. submit reply
-7. delete comment
-------
-*/
-  
-//get specific course clip about course clip about course clip about course clip about course clip about course clip about course clip 
-
-
-//modify Program
+//Program 관련 
+//프로그램은 총 네종류가 있음. Client, Server, DevOps, FullStack -> 이걸 구지 레코드를 만들진 않음.
