@@ -3,6 +3,7 @@ const { v4: uuidv4 } = require('uuid');
 const jwtHelper = require("../lib/jwtHelper");
 
 const Comment = db.comment 
+const User = db.user
 
 exports.create = async(req, res) => {
   const decoded = await jwtHelper.decodeHelper(req);
@@ -21,9 +22,11 @@ exports.create = async(req, res) => {
   //req 어떤식으로 올라나? content 랑, courseClip Id 가 오겠지?
   //content, courseClipId, username
   const newComment = await Comment.create({
-    username: userId,
+    userId: userId,
+    title: req.body.title,
     content: req.body.content, 
-    courseClipId: req.body.courseClipId
+    courseClipId: req.body.courseClipId,
+    recommendation: 0,
   })
 
   if (!newComment){
@@ -32,6 +35,27 @@ exports.create = async(req, res) => {
   }else{
     res.send({success: true , message: "success", comment: newComment})
   }
+}
+
+exports.getAll = async(req, res) => {
+  const comments = await Comment.findAll({});
+
+  const Users = await User.findAll({where: {id: comments.map(comment => {comment.userId})}})
+
+  comments.map(comment => {
+    let user = Users.find(user => user.id === comment.userId)
+    modifiedComments = {
+      username: user.username,
+      userImg: user.imgUrl,
+      title: comment.title,
+      content: comment.content,
+      recommendation: comment.recommendation,
+      courseClipId: comment.courseClipId,
+      id: comment.id
+    }
+    return modifiedComments
+  })
+  res.send({success:true, comments:modifiedComments});
 }
 
 exports.list = async(req, res) => {
@@ -44,10 +68,13 @@ exports.list = async(req, res) => {
   }
 
   const comments = await Comment.findAll({where: {courseClipId: req.body.courseClipId}});
+  //userId그대로 뿌려주지 말고, 가공 후 뿌려주기
   comments.map(comment => {
-    commentList = {username: comment.username, content: comment.content}
-    return commentList;
+    let user = await User.findOne({where: {id: comment.userId}}) 
+    commentUserList = {username: user.username, userImg:user.imgUrl, title: comment.title, content: comment.content}
+    return commentUserList;
   });
+
   //username과 content만 뿌려주기
   res.send({success:true, message: "success", commentList: commentList});
 }
@@ -57,17 +84,13 @@ exports.delete = async(req, res)=> {
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
 
-  const user = await User.findOne({where: {id: userId}});
-
   if (!user){
     res.send({success:false, message:"unknown user"});
     return;
   }
 
-  const username = user.username;
-
   const comment = await Comment.findOne({where: {id: req.body.commentId}});
-  if (!comment.username === username ){
+  if (!comment.userId === userId ){
     res.send({success:false, message: "not an exact user"});
     return;
   }else{
@@ -90,10 +113,9 @@ exports.update = async(req,res)=> {
     res.send({success:false, message:"unknown user"});
     return;
   }
-  const username = user.username;
 
   const comment = await Comment.findOne({where: {id: req.body.commentId}});
-  if (!comment.username === username){
+  if (!comment.userId === userId){
     res.send({success:false, message: "not an exact user"});
     return;
   }
