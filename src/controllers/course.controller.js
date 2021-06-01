@@ -105,3 +105,23 @@ exports.remove = async(req,res) => {
     res.send({success: true, message: "already deleted"})
   }
 }
+
+exports.apply = async(req, res) => {
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+
+  if(!userId){
+    res.send({success: false, message: "not logged in"})
+    return
+  }
+
+  const courseId = req.params.courseId
+
+  const userCourse = await UserCourse.create({
+    userId: userId,
+    courseId: courseId, 
+    progress: 0,
+  })
+
+  res.send({success: true, userCourse: userCourse})
+}
