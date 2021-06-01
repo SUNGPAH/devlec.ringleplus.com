@@ -14,11 +14,19 @@ exports.list = async (req,res) => {
 
 }
 exports.signup = (req, res) => {
-  console.log('-12093109283091280939180283');
-  console.log(req.body);
-  
-  console.log(bcrypt.hashSync(req.body.password, 8));
-  
+  console.log("executed")
+  const usernameCheck = User.findAll({where: {username: req.body.username}})
+  const emailCheck = User.findOne({where: {email: req.body.email}})
+  if (usernameCheck){
+    res.send({success:false, message: "Same Username"});
+    return; 
+  }
+  if (emailCheck){
+    res.send({success:false, message: "Same Email"});
+    return;
+  }
+  //유저 생성
+
   User.create({
     username: req.body.username,
     email: req.body.email,
