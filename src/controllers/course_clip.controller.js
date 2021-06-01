@@ -16,6 +16,7 @@ exports.add = async(req, res) => {
   const payload = {
     courseId: courseId,
     title: req.body.title,
+    description: req.body.description,
     documentUrl: req.body.documentUrl
   }
 
@@ -30,7 +31,7 @@ exports.remove = async(req, res) => {
     await record.destroy();
     res.send({success: true})
   }else{
-    res.send({success: true, message: "already deleted"})
+    res.send({success: false, message: "already deleted"})
   }
 }
 

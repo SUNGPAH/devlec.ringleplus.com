@@ -19,7 +19,7 @@ module.exports = (sequelize, DataTypes) => {
     imgUrl: DataTypes.STRING,
     totalEstimatedMin: DataTypes.INTEGER,
     programType: DataTypes.STRING,
-    courseOrder: DataTypes.JSON
+    courseOrder: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Course',
