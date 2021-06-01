@@ -13,15 +13,7 @@ exports.get = async(req, res) => {
 
 exports.add = async(req, res) => {
   const courseId = req.body.courseId
-  // const payload = {
-  //   courseId: courseId,
-  //   title: req.body.title,
-  //   description: req.body.description,
-  //   documentUrl: req.body.documentUrl
-  // }
-
   const payload = req.body 
-
   const courseClip = await db.CourseClip.create(payload)
   res.send({success: true, courseClip: courseClip })
 }
