@@ -8,6 +8,21 @@ var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
 exports.signup = (req, res) => {
+  //validation check..!
+  //User - username
+  //req.body.username
+  console.log("executed")
+  const usernameCheck = User.findAll({where: {username: req.body.username}})
+  const emailCheck = User.findOne({where: {email: req.body.email}})
+  if (usernameCheck){
+    res.send({success:false, message: "Same Username"});
+    return; 
+  }
+  if (emailCheck){
+    res.send({success:false, message: "Same Email"});
+    return;
+  }
+  //유저 생성
   User.create({
     username: req.body.username,
     email: req.body.email,
@@ -99,6 +114,7 @@ exports.signin = (req, res) => {
             id: user.id,
             username: user.username,
             email: user.email,
+            imgUrl: user.imgUrl,
             roles: authorities,
             accessToken: token
           }

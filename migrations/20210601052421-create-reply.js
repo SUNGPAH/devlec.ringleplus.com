@@ -1,27 +1,24 @@
 'use strict';
 module.exports = {
   up: async (queryInterface, Sequelize) => {
-    await queryInterface.createTable('Comments', {
+    await queryInterface.createTable('Replies', {
       id: {
         allowNull: false,
         autoIncrement: true,
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      courseClipId: {
+      commentId: {
         type: Sequelize.INTEGER,
+        allowNull: false
       },
       userId: {
         type: Sequelize.INTEGER,
-        allowNull: false,
+        allowNull: false
       },
       recommendation: {
         type: Sequelize.INTEGER,
         defaultValue: 0
-      },
-      title: {
-        type: Sequelize.STRING,
-        allowNull: false
       },
       content: {
         type: Sequelize.JSON
@@ -37,6 +34,6 @@ module.exports = {
     });
   },
   down: async (queryInterface, Sequelize) => {
-    await queryInterface.dropTable('Comments');
+    await queryInterface.dropTable('Replies');
   }
 };
