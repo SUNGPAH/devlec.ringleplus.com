@@ -16,6 +16,8 @@ app.listen(port, () => console.log(`server running up on port ${port}`));
 require('./routes/auth.routes')(app);
 require('./routes/course.routes')(app);
 require('./routes/course_clip.routes')(app);
+require('./routes/user_course.routes')(app);
+require('./routes/comment.routes')(app);
 
 const db = require("../models");
 

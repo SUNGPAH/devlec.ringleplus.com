@@ -38,20 +38,35 @@ exports.get = async(req,res) => {
   const userId = decoded.userId;
   const courseId = parseInt(req.params.courseId)
   const courseClips = await db.CourseClip.findAll({raw: true, where: {courseId: courseId}})
-  const course = await db.Course.findOne({where: {id: courseId}})
+  const course = await db.Course.findOne({raw: true, where: {id: courseId}})
+  
+  if(!course){
+    res.send({success: false, message: "not found"})
+    return
+  }
+
 
   if(userId) {
+    const userCourse = await db.UserCourse.findOne({where: {userId: userId, courseId: courseId}})
+
     const userCourseClips = await db.UserCourseClip.findAll({where: {
       courseClipId: courseClips.map(courseClip => courseClip.id),
       userId: userId
     }})
     
+    const what = await db.UserCourseClip.findAll();
+
     const _courseClips = courseClips.map(courseClip => {
-      const userCourseClip = userCourseClips.find(ucc => ucc.courseCliipId === courseClip.id)
+      const userCourseClip = userCourseClips.find(ucc => ucc.courseClipId === courseClip.id)
+      console.log('109283019283091823091820391829038');
+      console.log(userCourseClip);
       courseClip.userCourseClip = userCourseClip
       
       return courseClip
     })  
+
+    course.userCourse = userCourse
+
     res.send({success: true, courseClips: _courseClips, course: course })
 
   }else{
@@ -61,22 +76,12 @@ exports.get = async(req,res) => {
 }
 
 exports.add = async(req,res) => {
-  // const payload = {
-  //   title: "do somthing here..",
-  //   imgUrl: 'asdfasdf',
-  //   programType: "Client",
-  // }
-  // 여기는 어스가 된 사람만 되어야 함...
   const payload = req.body.payload
   const course = await db.Course.create(payload)
   res.send({success: true, course: course })  
 }
 
 exports.modify = async(req,res) => {
-  // const payload = {
-  //   title: "do somthing here..",
-  //   imgUrl: 'asdfasdf',
-  // }
   const payload = req.body
   const course = await db.Course.findOne({where: {id: req.params.courseId}})
   if(!course){
@@ -96,6 +101,15 @@ exports.modify = async(req,res) => {
 }
 
 exports.remove = async(req,res) => {
+
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+  
+  if(!userId){
+    res.send({success: false})
+    return
+  }
+
   const course = await db.Course.findOne({where: {id: req.params.courseId}})
 
   if(course){
@@ -117,11 +131,15 @@ exports.apply = async(req, res) => {
 
   const courseId = req.params.courseId
 
-  const userCourse = await UserCourse.create({
+  const userCourse = await db.UserCourse.create({
     userId: userId,
     courseId: courseId, 
     progress: 0,
   })
 
   res.send({success: true, userCourse: userCourse})
+}
+
+exports.qnas = async(req,res) => {
+  res.send({success: true, qnas: []})
 }

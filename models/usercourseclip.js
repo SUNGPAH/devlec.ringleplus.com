@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
   UserCourseClip.init({
     userId: DataTypes.INTEGER,
     courseClipId: DataTypes.INTEGER,
-    status: DataTypes.JSON
+    status: DataTypes.STRING
   }, {
     sequelize,
     modelName: 'UserCourseClip',
