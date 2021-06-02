@@ -11,8 +11,8 @@ exports.list = async (req,res) => {
   const users = await User.findAll();
 
   res.send({success: true, users: users})
-
 }
+
 exports.signup = (req, res) => {
   console.log("executed")
   const usernameCheck = User.findAll({where: {username: req.body.username}})

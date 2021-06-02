@@ -2,14 +2,11 @@ const db = require("../../models");
 const { v4: uuidv4 } = require('uuid');
 const jwtHelper = require("../lib/jwtHelper");
 
-const Comment = db.comment 
-const User = db.user
-
 exports.create = async(req, res) => {
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
 
-  const user = await User.find({where: {username: username}});
+  const user = await db.User.findOne({where: {id: userId}});
 
   if (!user){
     res.send({})
@@ -21,11 +18,11 @@ exports.create = async(req, res) => {
   }
   //req 어떤식으로 올라나? content 랑, courseClip Id 가 오겠지?
   //content, courseClipId, username
-  const newComment = await Comment.create({
+  const newComment = await db.Comment.create({
     userId: userId,
-    title: req.body.title,
+    title: "default",
     content: req.body.content, 
-    courseClipId: req.body.courseClipId,
+    courseId: req.body.courseId,
     recommendation: 0,
   })
 
@@ -37,40 +34,41 @@ exports.create = async(req, res) => {
   }
 }
 
-exports.getAll = async(req, res) => {
-  const comments = await Comment.findAll({});
+// exports.getAll = async(req, res) => {
+//   //!! -> need to fix!
+//   const comments = await Comment.findAll({});
 
-  const Users = await User.findAll({where: {id: comments.map(comment => {comment.userId})}})
+//   const Users = await User.findAll({where: {id: comments.map(comment => {comment.userId})}})
 
-  comments.map(comment => {
-    let user = Users.find(user => user.id === comment.userId)
-    modifiedComments = {
-      username: user.username,
-      userImg: user.imgUrl,
-      title: comment.title,
-      content: comment.content,
-      recommendation: comment.recommendation,
-      courseClipId: comment.courseClipId,
-      id: comment.id
-    }
-    return modifiedComments
-  })
-  res.send({success:true, comments:modifiedComments});
-}
+//   comments.map(comment => {
+//     let user = Users.find(user => user.id === comment.userId)
+//     modifiedComments = {
+//       username: user.username,
+//       userImg: user.imgUrl,
+//       title: comment.title,
+//       content: comment.content,
+//       recommendation: comment.recommendation,
+//       courseClipId: comment.courseClipId,
+//       id: comment.id
+//     }
+//     return modifiedComments
+//   })
+//   res.send({success:true, comments:modifiedComments});
+// }
 
 exports.list = async(req, res) => {
-  //req의 courseClipId 와 일치하는 comment 모두 가져오기 -> username 까지..!
-  //req.body.courseClipId
-
-  if (!req.body.courseClipId){
+  if (!req.query.courseId){
     res.send({success:false, message:"No Course Clip Id"});
     return
   }
+  const courseId = req.query.courseId
 
-  const comments = await Comment.findAll({where: {courseClipId: req.body.courseClipId}});
-  //userId그대로 뿌려주지 말고, 가공 후 뿌려주기
-  comments.map(comment => {
-    let user = await User.findOne({where: {id: comment.userId}}) 
+  const comments = await db.Comment.findAll({where: {courseId: courseId}});
+  const commentors = await db.User.findAll({where: {id: comments.map(x => x.userId)}})
+
+  const commentList = comments.map(comment => {
+    // let user = await User.findOne({where: {id: comment.userId}}) 
+    const user = commentors.find(commentor => commentor.id === comment.userId)
     commentUserList = {username: user.username, userImg:user.imgUrl, title: comment.title, content: comment.content}
     return commentUserList;
   });
