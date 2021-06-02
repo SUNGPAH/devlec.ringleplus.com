@@ -28,8 +28,11 @@ exports.setCurrentCourseClipId = async(req, res) => {
       //..?
     }
   }else{
+    const courseClip = await db.CourseClip.findOne({where: {id: courseClipId}})
+    
     let initStatus
-    if (!userCourseClip.voidUUid){
+    
+    if (!courseClip.vodUUid){
       initStatus = "done"
     }else{
       initStatus = "started"

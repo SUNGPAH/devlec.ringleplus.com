@@ -53,15 +53,13 @@ exports.get = async(req,res) => {
       courseClipId: courseClips.map(courseClip => courseClip.id),
       userId: userId
     }})
-
-    console.log('1092381092380912893');
-    console.log(userCourseClips);
     
     const what = await db.UserCourseClip.findAll();
-    console.log(what)
 
     const _courseClips = courseClips.map(courseClip => {
-      const userCourseClip = userCourseClips.find(ucc => ucc.courseCliipId === courseClip.id)
+      const userCourseClip = userCourseClips.find(ucc => ucc.courseClipId === courseClip.id)
+      console.log('109283019283091823091820391829038');
+      console.log(userCourseClip);
       courseClip.userCourseClip = userCourseClip
       
       return courseClip
@@ -103,6 +101,15 @@ exports.modify = async(req,res) => {
 }
 
 exports.remove = async(req,res) => {
+
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+  
+  if(!userId){
+    res.send({success: false})
+    return
+  }
+
   const course = await db.Course.findOne({where: {id: req.params.courseId}})
 
   if(course){
