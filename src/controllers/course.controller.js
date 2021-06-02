@@ -139,3 +139,7 @@ exports.apply = async(req, res) => {
 
   res.send({success: true, userCourse: userCourse})
 }
+
+exports.qnas = async(req,res) => {
+  res.send({success: true, qnas: []})
+}
