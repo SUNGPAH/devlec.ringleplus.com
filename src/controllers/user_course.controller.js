@@ -20,5 +20,23 @@ exports.setCurrentCourseClipId = async(req, res) => {
   userCourse.currentCourseClipId = courseClipId
   await userCourse.save()
 
+  const userCourseClip = await db.UserCourseClip.findOne({where: {userId: userId, courseClipId: courseClipId}})
+  if (userCourseClip){
+    if(userCourseClip.status === "done"){
+      //pass..
+    }else{
+      //..?
+    }
+  }else{
+    let initStatus
+    if (!userCourseClip.voidUUid){
+      initStatus = "done"
+    }else{
+      initStatus = "started"
+    }
+
+    const newUserCourseClip = await db.UserCourseClip.create({userId: userId, courseClipId: courseClipId, status: initStatus})    
+  }
+
   res.send({success: true, userCourse: userCourse})  
 }
