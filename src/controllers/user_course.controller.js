@@ -2,12 +2,9 @@ const db = require("../../models");
 const { v4: uuidv4 } = require('uuid');
 const jwtHelper = require("../lib/jwtHelper");
 
-// const Comment = db.comment 
-
 exports.setCurrentCourseClipId = async(req, res) => {
   const courseId = req.body.courseId
   const courseClipId = req.body.courseClipId
-
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
 
@@ -23,15 +20,12 @@ exports.setCurrentCourseClipId = async(req, res) => {
   const userCourseClip = await db.UserCourseClip.findOne({where: {userId: userId, courseClipId: courseClipId}})
   if (userCourseClip){
     if(userCourseClip.status === "done"){
-      //pass..
     }else{
-      //..?
     }
   }else{
     const courseClip = await db.CourseClip.findOne({where: {id: courseClipId}})
     
-    let initStatus
-    
+    let initStatus    
     if (!courseClip.vodUUid){
       initStatus = "done"
     }else{

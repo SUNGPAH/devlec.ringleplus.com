@@ -6,9 +6,7 @@ exports.create = async(req, res) => {
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
 
-  const user = await db.User.findOne({where: {id: userId}});
-
-  if (!user){
+  if (!userId){
     res.send({})
   }
 
@@ -26,11 +24,17 @@ exports.create = async(req, res) => {
     recommendation: 0,
   })
 
-  if (!newComment){
+  const rawComment = newComment.get({plain:true})
+  const user = await db.User.findOne({where: {id: userId}});
+  
+  rawComment.userImg = user.userImg
+  rawComment.username = user.username 
+
+  if (!rawComment){
     res.send({success: false, message: "Something went wrong"});
     return; 
   }else{
-    res.send({success: true , message: "success", comment: newComment})
+    res.send({success: true , message: "success", comment: rawComment})
   }
 }
 
