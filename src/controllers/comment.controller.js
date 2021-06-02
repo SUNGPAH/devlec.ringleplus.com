@@ -57,11 +57,11 @@ exports.create = async(req, res) => {
 // }
 
 exports.list = async(req, res) => {
-  if (!req.query.courseId){
-    res.send({success:false, message:"No Course Clip Id"});
+  if (!req.params.courseId){
+    res.send({success:false, message:"No CourseId"});
     return
   }
-  const courseId = req.query.courseId
+  const courseId = parseInt(req.params.courseId)
 
   const comments = await db.Comment.findAll({where: {courseId: courseId}});
   const commentors = await db.User.findAll({where: {id: comments.map(x => x.userId)}})
