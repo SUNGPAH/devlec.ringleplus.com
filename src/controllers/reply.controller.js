@@ -1,8 +1,8 @@
 const db = require("../../models");
 const jwtHelper = require("../lib/jwtHelper");
 
-const Reply = db.reply
-const User = db.user
+const Reply = db.Reply
+const User = db.User
 
 exports.create = async(req, res) => {
   const decoded = await jwtHelper.decodeHelper(req);
@@ -23,8 +23,8 @@ exports.create = async(req, res) => {
 
   const newReply = await Reply.create({
     commentId: req.body.commentId,
-    userId = req.body.userId,
-    content = req.body.content,
+    userId: req.body.userId,
+    content: req.body.content,
     recommendation: 0,
   })
 
@@ -48,12 +48,16 @@ exports.create = async(req, res) => {
   res.send({success: true, reply: modifiedReply});
 
 }
-exports.get = (req, res) => {
+exports.get = async(req, res) => {
   //params
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
+  if (!req.params.replyId){
+    res.send({success:false, message:"No CommentId"});
+    return
+  }
+  const replyId = parseInt(req.params.replyId);
 
-  const replyId = parseInt(req.params.replyId)
   const reply = await Reply.findOne({where: {id:replyId}});
 
   if (!reply){
@@ -73,27 +77,27 @@ exports.get = (req, res) => {
 
 }
 
-exports.getListWithCommendId = async(req, res) => {
+exports.list = async(req, res) => {
   //req 로 commentId를 가져온다.
-  if(!req.body.commentId){
+  if(!req.params.commentId){
     res.send({success: false, message: "No commentId"});
     return
   }
-  const replies = await Reply.findAll({where: {commentId: req.body.commentId}});
-  
+  const commentId = parseInt(req.params.commentId)
+  const replies = await Reply.findAll({where: {commentId: commentId}});
   const Users = await User.findAll({where: {id: replies.map(reply => {reply.userId})}});
 
-  replies.map(reply => {
-    let user = Users.find(user => user.id === reply.userId)
+  const replyList = replies.map(reply => {
+    const user = Users.find(user => user.id === reply.userId)
     commentReplies = {
       username: user.username,
-      userImg:user.imgUrl, 
-      content:reply.content, 
-      recommendation:reply.recommendation,
+      userImg: user.imgUrl, 
+      content: reply.content, 
+      recommendation: reply.recommendation,
     }
     return commentReplies;
   })
-  res.send({success:true, message:"success", commentReplies: commentReplies});
+  res.send({success:true, message:"success", replyList: replyList});
 }
 
 exports.update = async(req, res) => {

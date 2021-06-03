@@ -5,8 +5,8 @@ module.exports = function(app) {
   const reply = require("../controllers/reply.controller.js");
 
   router.post("/create", reply.create)
-  router.get("/get/replyId", reply.get)
-  router.post("/getListWithCommentId", reply.getListWithCommentId)
+  router.get("/get/:replyId", reply.get)
+  router.get("/list/:commentId", reply.list)
   router.post("/remove", reply.remove)
   router.post("/update", reply.update)
 

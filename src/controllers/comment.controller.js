@@ -59,6 +59,34 @@ exports.create = async(req, res) => {
 //   })
 //   res.send({success:true, comments:modifiedComments});
 // }
+exports.get = async(req, res) => {
+  if (!req.params.commentId ){
+    res.send({success:false, message:"No CommentId"});
+    return
+  }
+  const commentId = parseInt(req.params.commentId);
+
+  const comment = await db.Comment.findOne({where: {id:commentId}});
+  const commentor = await db.User.findOne({where: {id: comment.userId}});
+
+  if (!comment){
+    res.send({success:false, message: "comment not Found"})
+    return
+  }
+  if (!commentor){
+    res.send({success:false, message: "commentor not found"})
+    return
+  }
+  const commentData = {
+    username: commentor.username,
+    userImg: commentor.imgUrl,
+    title: comment.title,
+    content: comment.content,
+    recommendation: comment.recommendation, 
+    commentId: comment.id
+  }
+  res.send({success:true, message: "success", commentData: commentData});  
+}
 
 exports.list = async(req, res) => {
   if (!req.params.courseId){
@@ -73,7 +101,7 @@ exports.list = async(req, res) => {
   const commentList = comments.map(comment => {
     // let user = await User.findOne({where: {id: comment.userId}}) 
     const user = commentors.find(commentor => commentor.id === comment.userId)
-    commentUserList = {username: user.username, userImg:user.imgUrl, title: comment.title, content: comment.content}
+    commentUserList = {username: user.username, userImg:user.imgUrl, title: comment.title, content: comment.content, id:comment.id}
     return commentUserList;
   });
 
