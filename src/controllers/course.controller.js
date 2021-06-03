@@ -143,3 +143,26 @@ exports.apply = async(req, res) => {
 exports.qnas = async(req,res) => {
   res.send({success: true, qnas: []})
 }
+
+exports.mycourses = async(req,res) => {
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+
+  if(!userId){
+    res.send({success: false, message: "not logged in"})
+    return
+  }
+
+  const userCourses = await db.UserCourse.findAll({raw: true,where: {userId: userId}})
+  const courseIds = userCourses.map(x => x.courseId)
+  const courses = await db.Course.findAll({raw: true, where: {id: courseIds}})
+
+  console.log(courses); 
+
+  const mycourses = userCourses.map(userCourse => {
+    const course = courses.find(course => course.id === userCourse.courseId)
+    return {...course, userCourse: userCourse}
+  })
+
+  res.send({success: true, mycourses: mycourses})
+}
