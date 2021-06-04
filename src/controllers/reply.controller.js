@@ -1,3 +1,4 @@
+const e = require("express");
 const db = require("../../models");
 const jwtHelper = require("../lib/jwtHelper");
 
@@ -20,10 +21,9 @@ exports.create = async(req, res) => {
     res.send({success:false, message: "Not a same user"})
     return;
   }
-
   const newReply = await Reply.create({
     commentId: req.body.commentId,
-    userId: req.body.userId,
+    userId: userId,
     content: req.body.content,
     recommendation: 0,
   })
@@ -32,26 +32,28 @@ exports.create = async(req, res) => {
     res.send({success: false, message: "Something went wrong"});
     return; 
   }
+  res.send({success:true, message:"success"})
 
-  const user = await User.findOne({where: {id: newReply.userId}});
-  if(!user){
-    res.send({success: false, message: "Writer not found"})
-    return;
-  }
-  const modifiedReply = {
-    username: user.username,
-    userImg: user.imgUrl,
-    content: newReply.content,
-    recommendation: newReply.recommendation,
-  }
+  // const user = await User.findOne({where: {id: newReply.userId}});
+  // if(!user){
+  //   res.send({success: false, message: "Writer not found"})
+  //   return;
+  // }
+  // const modifiedReply = {
+  //   username: user.username,
+  //   userImg: user.imgUrl,
+  //   content: newReply.content,
+  //   recommendation: newReply.recommendation,
+  // }
 
-  res.send({success: true, reply: modifiedReply});
+  // res.send({success: true, reply: modifiedReply});
 
 }
 exports.get = async(req, res) => {
   //params
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
+
   if (!req.params.replyId){
     res.send({success:false, message:"No CommentId"});
     return
@@ -66,6 +68,8 @@ exports.get = async(req, res) => {
   }
 
   const user = await User.findOne({where: {id: reply.userId}}); 
+  
+  console.log(user);
 
   const modifiedReply = {
     content: reply.content,
@@ -85,19 +89,32 @@ exports.list = async(req, res) => {
   }
   const commentId = parseInt(req.params.commentId)
   const replies = await Reply.findAll({where: {commentId: commentId}});
-  const Users = await User.findAll({where: {id: replies.map(reply => {reply.userId})}});
+  const repliers = await db.User.findAll({where: {id: replies.map(reply => reply.userId)}});
 
-  const replyList = replies.map(reply => {
-    const user = Users.find(user => user.id === reply.userId)
-    commentReplies = {
-      username: user.username,
-      userImg: user.imgUrl, 
-      content: reply.content, 
-      recommendation: reply.recommendation,
+  const commentReplies = replies.map(reply => {
+    const user = repliers.find(user => user.id === reply.userId)
+    //유저 없는거 table에서 지우기...
+    if (!user){
+      const commentReplies = {
+        username: "none",
+        userImg: "",
+        content: "none",
+        recommendation: 0
+      }
+      return commentReplies;
+    }else{
+      const commentReplies = {
+        username: user.username,
+        userImg: user.imgUrl, 
+        content: reply.content, 
+        recommendation: reply.recommendation,
+      }
+      return commentReplies;
     }
-    return commentReplies;
   })
-  res.send({success:true, message:"success", replyList: replyList});
+
+  console.log(commentReplies);
+  res.send({success:true, message:"success", replyList: commentReplies});
 }
 
 exports.update = async(req, res) => {

@@ -21,4 +21,7 @@ module.exports = function(app) {
   app.get("/api/user/list", controller.list);
 
   app.post("/api/auth/signin", controller.signin);
+
+  app.post("/api/user/info", controller.userinfo);
+
 };
