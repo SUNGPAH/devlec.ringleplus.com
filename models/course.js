@@ -4,13 +4,7 @@ const {
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Course extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
     }
   };
   Course.init({
@@ -23,6 +17,9 @@ module.exports = (sequelize, DataTypes) => {
     preparation: DataTypes.STRING,
     learning: DataTypes.STRING,
     techStacks: DataTypes.JSON,
+    difficulty: DataTypes.STRING,
+    subtitle: DataTypes.STRING,
+    resultImgUrl: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Course',

@@ -53,12 +53,8 @@ exports.get = async(req,res) => {
       userId: userId
     }})
     
-    const what = await db.UserCourseClip.findAll();
-
     const _courseClips = courseClips.map(courseClip => {
       const userCourseClip = userCourseClips.find(ucc => ucc.courseClipId === courseClip.id)
-      console.log('109283019283091823091820391829038');
-      console.log(userCourseClip);
       courseClip.userCourseClip = userCourseClip
       
       return courseClip
@@ -130,11 +126,15 @@ exports.apply = async(req, res) => {
 
   const courseId = req.params.courseId
 
+  //이미 있는 경우는>>/
   const userCourse = await db.UserCourse.create({
     userId: userId,
     courseId: courseId, 
     progress: 0,
   })
+
+  console.log('102938019283091283');
+  console.log(courseId)
 
   res.send({success: true, userCourse: userCourse})
 }
