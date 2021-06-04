@@ -1,15 +1,16 @@
 const db = require("../../models");
 const { v4: uuidv4 } = require('uuid');
 const jwtHelper = require("../lib/jwtHelper");
+// const { endsWith } = require("sequelize/types/lib/operators");
 
 exports.create = async(req, res) => {
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
 
   if (!userId){
-    res.send({})
+    res.send({success:false, message: "No user!"})
   }
-
+  console.log(req.body);
   if (!req.body.content){
     res.send({success:false, message: "No content"});
     return;
@@ -18,9 +19,10 @@ exports.create = async(req, res) => {
   //content, courseClipId, username
   const newComment = await db.Comment.create({
     userId: userId,
-    title: "default",
+    title: req.body.title,
     content: req.body.content, 
     courseId: req.body.courseId,
+    courseClipId: 1,
     recommendation: 0,
   })
 
@@ -98,10 +100,15 @@ exports.list = async(req, res) => {
   const comments = await db.Comment.findAll({where: {courseId: courseId}});
   const commentors = await db.User.findAll({where: {id: comments.map(x => x.userId)}})
 
+  const replies = await db.Reply.findAll({where: {commentId: comments.map(x => x.id)}})
+  //다 가져오고..
+  
   const commentList = comments.map(comment => {
     // let user = await User.findOne({where: {id: comment.userId}}) 
     const user = commentors.find(commentor => commentor.id === comment.userId)
-    commentUserList = {username: user.username, userImg:user.imgUrl, title: comment.title, content: comment.content, id:comment.id}
+    const reply = replies.filter(reply => reply.commentId === comment.id);
+
+    commentUserList = {username: user.username, userImg:user.imgUrl, title: comment.title, content: comment.content, id:comment.id, recommendation:comment.recommendation, replies: reply.length}
     return commentUserList;
   });
 
