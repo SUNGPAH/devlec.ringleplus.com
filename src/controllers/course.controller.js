@@ -45,7 +45,6 @@ exports.get = async(req,res) => {
     return
   }
 
-
   if(userId) {
     const userCourse = await db.UserCourse.findOne({where: {userId: userId, courseId: courseId}})
 

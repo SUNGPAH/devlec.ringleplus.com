@@ -14,3 +14,7 @@ module.exports = function(app) {
   router.post("/add", course.add)
   app.use('/api/course', router);
 };
+
+/*
+  course.techStacks = ["html", "javascript", "react", "nodejs"]
+*/

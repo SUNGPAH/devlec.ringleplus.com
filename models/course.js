@@ -22,6 +22,7 @@ module.exports = (sequelize, DataTypes) => {
     courseOrder: DataTypes.INTEGER,
     preparation: DataTypes.STRING,
     learning: DataTypes.STRING,
+    techStacks: DataTypes.JSON,
   }, {
     sequelize,
     modelName: 'Course',
