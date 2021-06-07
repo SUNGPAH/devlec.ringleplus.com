@@ -19,7 +19,7 @@ exports.list = async(req, res) => {
   }
 
   if(userId){
-    const userCourses = await db.UserCourse.findAll({where: {userId: userId, courseId: {$in: [4,5]} }})
+    const userCourses = await db.UserCourse.findAll({where: {userId: userId, courseId: courses.map(course => course.id)}})
     const _courses = courses.map(course => {
       userCourse = userCourses.find(userCourse => userCourse.courseId === course.id)    
       course.userCourse = userCourse
@@ -175,12 +175,12 @@ exports.mycourses = async(req,res) => {
   const userCourses = await db.UserCourse.findAll({raw: true,where: {userId: userId}})
   const courseIds = userCourses.map(x => x.courseId)
   const courses = await db.Course.findAll({raw: true, where: {id: courseIds}})
-
-  console.log(courses); 
+  const userReviews = await db.UserReview.findAll({userId: userId})
 
   const mycourses = userCourses.map(userCourse => {
     const course = courses.find(course => course.id === userCourse.courseId)
-    return {...course, userCourse: userCourse}
+    const userReview = userReviews.find(userReview => userReview.courseId === userCourse.courseId)
+    return {...course, userCourse: userCourse, userReview: userReview}
   })
 
   res.send({success: true, mycourses: mycourses})

@@ -19,6 +19,7 @@ require('./routes/course_clip.routes')(app);
 require('./routes/user_course.routes')(app);
 require('./routes/comment.routes')(app);
 require('./routes/reply.routes')(app);
+require('./routes/review.routes')(app);
 
 const db = require("../models");
 
