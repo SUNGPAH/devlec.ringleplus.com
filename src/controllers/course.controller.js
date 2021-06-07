@@ -115,6 +115,23 @@ exports.remove = async(req,res) => {
   }
 }
 
+//api/course/drop/5
+exports.drop = async(req, res) => {
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+  const courseId = req.params.courseId
+
+  if(!userId){
+    res.send({success: false, message: "not logged in"})
+    return
+  }
+
+  let userCourses = await UserCourse.findAll({where: {userId: userId, courseId: courseId}});
+  await userCourses.destry();
+
+  res.send({success: true, message: "deleted"})
+}
+
 exports.apply = async(req, res) => {
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
@@ -126,15 +143,18 @@ exports.apply = async(req, res) => {
 
   const courseId = req.params.courseId
 
-  //이미 있는 경우는>>/
-  const userCourse = await db.UserCourse.create({
+  let userCourse = await db.UserCourse.findOne({where: {
     userId: userId,
-    courseId: courseId, 
-    progress: 0,
-  })
+    courseId: courseId
+  }})
 
-  console.log('102938019283091283');
-  console.log(courseId)
+  if (!userCourse){
+    userCourse = await db.UserCourse.create({
+      userId: userId,
+      courseId: courseId, 
+      progress: 0,
+    })
+  }
 
   res.send({success: true, userCourse: userCourse})
 }

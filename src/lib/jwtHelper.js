@@ -18,7 +18,7 @@ exports.decodeHelper = async (req) => {
     jwt.verify(token, config.secret, options, function(err, decoded){
       if (err){
         reject(err)
-        return
+        return  
       }
       resolve(decoded)
     })
