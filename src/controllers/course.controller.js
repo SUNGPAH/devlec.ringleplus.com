@@ -18,6 +18,9 @@ exports.list = async(req, res) => {
     return
   }
 
+  console.log('1o298319280391820938');
+  console.log(courses);
+
   if(userId){
     const userCourses = await db.UserCourse.findAll({where: {userId: userId, courseId: courses.map(course => course.id)}})
     const _courses = courses.map(course => {
@@ -126,8 +129,7 @@ exports.drop = async(req, res) => {
     return
   }
 
-  let userCourses = await UserCourse.findAll({where: {userId: userId, courseId: courseId}});
-  await userCourses.destry();
+  await db.UserCourse.destroy({where: {userId: userId, courseId: courseId}});
 
   res.send({success: true, message: "deleted"})
 }
@@ -175,7 +177,7 @@ exports.mycourses = async(req,res) => {
   const userCourses = await db.UserCourse.findAll({raw: true,where: {userId: userId}})
   const courseIds = userCourses.map(x => x.courseId)
   const courses = await db.Course.findAll({raw: true, where: {id: courseIds}})
-  const userReviews = await db.UserReview.findAll({userId: userId})
+  const userReviews = await db.UserReview.findAll({where: {userId: userId}})
 
   const mycourses = userCourses.map(userCourse => {
     const course = courses.find(course => course.id === userCourse.courseId)

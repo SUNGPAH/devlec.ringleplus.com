@@ -20,3 +20,11 @@ exports.create = async(req, res) => {
 
   res.send({success: true, message: "created", userReview: userReview})
 }
+
+exports.list = async(req,res) => {
+  const userReviews = await db.UserReview.findAll({where:{courseId: req.query.courseId},
+    include: db.User}
+  )
+    
+  res.send({success: true, message: "created", reviews: userReviews})
+}

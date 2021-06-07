@@ -5,6 +5,7 @@ const {
 module.exports = (sequelize, DataTypes) => {
   class UserReview extends Model {
     static associate(models) {
+      UserReview.belongsTo(models.User);
     }
   };
   UserReview.init({
