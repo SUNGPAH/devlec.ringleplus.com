@@ -8,7 +8,29 @@ const Op = db.Sequelize.Op;
 var jwt = require("jsonwebtoken");
 var bcrypt = require("bcryptjs");
 
-exports.list = async (req,res) => {
+exports.update = async(req,res) => {
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+
+  if (!userId){
+    res.send({success: false})
+  }
+
+  const user = await db.User.findOne({where:{id: userId}})
+  
+  try{
+    user.username = req.body.username
+    await user.save()
+    res.send({success: true, user: user})
+  }catch(e){
+    console.log(e);
+    res.send({success: false})
+  } 
+
+}
+
+exports.list =
+ async (req,res) => {
   const users = await User.findAll();
 
   res.send({success: true, users: users})
