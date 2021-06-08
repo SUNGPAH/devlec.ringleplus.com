@@ -14,6 +14,7 @@ module.exports = (sequelize, DataTypes) => {
     title: DataTypes.STRING,
     recommendation: DataTypes.INTEGER,
     content: DataTypes.JSON,
+    thumbCnt: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Comment',

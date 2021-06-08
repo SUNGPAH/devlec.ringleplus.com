@@ -9,6 +9,7 @@ module.exports = function(app) {
   router.get("/list/:commentId", reply.list)
   router.post("/remove", reply.remove)
   router.post("/update", reply.update)
-
+  router.post("/thumbup", reply.thumbup)
+  router.post("/thumbupCancel", reply.thumbupCancel)
   app.use('/api/reply', router);
 }

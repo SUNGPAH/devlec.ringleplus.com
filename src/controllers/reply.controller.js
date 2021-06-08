@@ -25,7 +25,7 @@ exports.create = async(req, res) => {
     commentId: req.body.commentId,
     userId: userId,
     content: req.body.content,
-    recommendation: 0,
+    thumbCnt: 0,
   })
 
   if (!newReply){
@@ -33,22 +33,8 @@ exports.create = async(req, res) => {
     return; 
   }
   res.send({success:true, message:"success", reply: newReply})
-
-  // const user = await User.findOne({where: {id: newReply.userId}});
-  // if(!user){
-  //   res.send({success: false, message: "Writer not found"})
-  //   return;
-  // }
-  // const modifiedReply = {
-  //   username: user.username,
-  //   userImg: user.imgUrl,
-  //   content: newReply.content,
-  //   recommendation: newReply.recommendation,
-  // }
-
-  // res.send({success: true, reply: modifiedReply});
-
 }
+
 exports.get = async(req, res) => {
   //params
   const decoded = await jwtHelper.decodeHelper(req);
@@ -69,11 +55,8 @@ exports.get = async(req, res) => {
 
   const user = await User.findOne({where: {id: reply.userId}}); 
   
-  console.log(user);
-
   const modifiedReply = {
     content: reply.content,
-    recommendation: reply.recommendation,
     username: user.username,
     userImg: user.imgUrl,
   }
@@ -82,32 +65,47 @@ exports.get = async(req, res) => {
 }
 
 exports.list = async(req, res) => {
-  //req 로 commentId를 가져온다.
   if(!req.params.commentId){
     res.send({success: false, message: "No commentId"});
     return
   }
+
   const commentId = parseInt(req.params.commentId)
   const replies = await Reply.findAll({where: {commentId: commentId}});
   const repliers = await db.User.findAll({where: {id: replies.map(reply => reply.userId)}});
 
+  const replyIds = replies.map(x => x.id)
+
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+
+  let userThumbups 
+  if(userId){
+    userThumbups = await db.UserThumbup.findAll({where: {userId: userId, sourceId: replyIds, sourceType: "Reply"}})
+  }
+
   const commentReplies = replies.map(reply => {
     const user = repliers.find(user => user.id === reply.userId)
-    //유저 없는거 table에서 지우기...
+    const userThumbup = userThumbups.find(x => x.sourceId === reply.id)
+
     if (!user){
       const commentReplies = {
+        id: reply.id,
         username: "none",
         userImg: "",
         content: "none",
-        recommendation: 0
+        thumbCnt: reply.thumbCnt || 0,
+        userThumbup: userThumbup,
       }
       return commentReplies;
     }else{
       const commentReplies = {
+        id: reply.id,
         username: user.username,
         userImg: user.imgUrl, 
         content: reply.content, 
-        recommendation: reply.recommendation,
+        thumbCnt: reply.thumbCnt || 0,
+        userThumbup: userThumbup,
       }
       return commentReplies;
     }
@@ -139,7 +137,6 @@ exports.update = async(req, res) => {
     username: user.username,
     userImg: user.imgUrl,
     content: reply.content,
-    recommendation: reply.recommendation,
   }
   res.send({success:true, reply: modifiedReply});
 }
@@ -153,4 +150,78 @@ exports.remove = async(req,res) => {
   }else{
     res.send({success:true, message:"Reply already doesn't exist"})
   }
+}
+
+exports.thumbup = async(req,res) => {
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+  const sourceId = req.body.sourceId
+  const sourceType = req.body.sourceType
+
+  const condition = {userId: userId, sourceId: sourceId, sourceType: sourceType}
+  let thumbup = await db.UserThumbup.findOne({where: condition})
+  
+  
+  // await db.UserThumbup.destroy({where: condition})
+  // res.send({success: true})
+  // return
+
+  let comment
+  if(!thumbup){
+    thumbup = await db.UserThumbup.create(condition)
+
+    if(sourceType === "Comment"){
+      comment = await db.Comment.findOne({where:{id: sourceId}})
+      if(comment.thumbCnt){
+        comment.thumbCnt = comment.thumbCnt + 1
+      }else{
+        comment.thumbCnt = 1
+      }
+
+      await comment.save()
+      console.log('---------comment!!!');
+      console.log(comment);
+    }
+    
+    if(sourceType === "Reply"){
+      console.log('reply')
+      const reply = await db.Reply.findOne({where:{id: sourceId}})
+      reply.thumbCnt = reply.thumbCnt + 1
+      await reply.save()
+    }
+  }
+
+  
+
+  res.send({success: true, thumbup: thumbup, comment: comment})
+}
+
+exports.thumbupCancel = async(req,res) => {
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+  const sourceId = req.body.sourceId
+  const sourceType = req.body.sourceType
+  const condition = {userId: userId, sourceId: sourceId, sourceType: sourceType}
+  const thumbup = await db.UserThumbup.findOne({where: condition})
+  
+  if(thumbup){
+    await thumbup.destroy()
+  
+    if(sourceType === "Comment"){
+      comment = await db.Comment.findOne({where:{id: sourceId}})
+      if(comment.thumbCnt){
+        comment.thumbCnt = comment.thumbCnt - 1
+      }
+      await comment.save()
+    }
+
+    if(sourceType === "Reply"){
+      const reply = await db.Reply.findOne({where:{id: sourceId}})
+      reply.thumbCnt = reply.thumbCnt - 1
+      await reply.save()
+    }
+
+  }
+
+  res.send({success: true})
 }

@@ -23,7 +23,7 @@ exports.create = async(req, res) => {
     content: req.body.content, 
     courseId: req.body.courseId,
     courseClipId: 1,
-    recommendation: 0,
+    thumbCnt: 0,
   })
 
   const rawComment = newComment.get({plain:true})
@@ -40,27 +40,6 @@ exports.create = async(req, res) => {
   }
 }
 
-// exports.getAll = async(req, res) => {
-//   //!! -> need to fix!
-//   const comments = await Comment.findAll({});
-
-//   const Users = await User.findAll({where: {id: comments.map(comment => {comment.userId})}})
-
-//   comments.map(comment => {
-//     let user = Users.find(user => user.id === comment.userId)
-//     modifiedComments = {
-//       username: user.username,
-//       userImg: user.imgUrl,
-//       title: comment.title,
-//       content: comment.content,
-//       recommendation: comment.recommendation,
-//       courseClipId: comment.courseClipId,
-//       id: comment.id
-//     }
-//     return modifiedComments
-//   })
-//   res.send({success:true, comments:modifiedComments});
-// }
 exports.get = async(req, res) => {
   if (!req.params.commentId ){
     res.send({success:false, message:"No CommentId"});
@@ -79,13 +58,24 @@ exports.get = async(req, res) => {
     res.send({success:false, message: "commentor not found"})
     return
   }
+
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+
+  let userThumbup 
+  if(userId){
+    userThumbup = await db.UserThumbup.findOne({where:{userId, sourceType: "Comment", sourceId: commentId}})
+  }
+
   const commentData = {
     username: commentor.username,
     userImg: commentor.imgUrl,
     title: comment.title,
     content: comment.content,
+    thumbCnt: comment.thumbCnt || 0,
     recommendation: comment.recommendation, 
-    commentId: comment.id
+    id: comment.id,
+    userThumbup: userThumbup,
   }
   res.send({success:true, message: "success", commentData: commentData});  
 }
@@ -108,7 +98,15 @@ exports.list = async(req, res) => {
     const user = commentors.find(commentor => commentor.id === comment.userId)
     const reply = replies.filter(reply => reply.commentId === comment.id);
 
-    commentUserList = {username: user.username, userImg:user.imgUrl, title: comment.title, content: comment.content, id:comment.id, recommendation:comment.recommendation, replies: reply.length}
+    commentUserList = {
+      username: user.username, 
+      userImg:user.imgUrl, 
+      title: comment.title, 
+      content: comment.content, 
+      thumbCnt: comment.thumbCnt || 0,
+      id:comment.id, 
+      recommendation:comment.recommendation, 
+      replies: reply.length}
     return commentUserList;
   });
 
