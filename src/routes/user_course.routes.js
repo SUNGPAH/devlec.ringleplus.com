@@ -3,5 +3,8 @@ module.exports = function(app) {
   const userCourse = require("../controllers/user_course.controller.js");
 
   router.post("/setCurrentCourseClipId", userCourse.setCurrentCourseClipId)
+  router.post("/removeUserCourseClips", userCourse.removeUserCourseClips)
+
+  
   app.use('/api/userCourse', router);
 }
