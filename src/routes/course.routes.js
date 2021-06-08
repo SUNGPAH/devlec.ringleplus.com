@@ -2,6 +2,7 @@
 module.exports = function(app) {
 
   var router = require("express").Router();
+  var adminRouter = require("express").Router();
   const course = require("../controllers/course.controller.js");
 
   router.get("/list", course.list);
@@ -10,18 +11,15 @@ module.exports = function(app) {
   router.get("/mycourses", course.mycourses)
   router.post("/apply/:courseId", course.apply)
   router.post("/drop/:courseId", course.drop)
-  //only admin..
-  router.post("/add", course.add)
-  router.post("/modify/:courseId", course.modify)
-  router.post("/remove/:courseId", course.remove)
-  router.get("/getUploadableImgUrl", course.getUploadableImgUrl)
-
-  router.post("/grantImgPermission", course.grantImgPermission)
-
-
-  
-
   app.use('/api/course', router);
+
+  //only admin..
+  adminRouter.post("/add", course.add)
+  adminRouter.post("/modify/:courseId", course.modify)
+  adminRouter.post("/remove/:courseId", course.remove)
+  adminRouter.get("/getUploadableImgUrl", course.getUploadableImgUrl)
+  adminRouter.post("/grantImgPermission", course.grantImgPermission)
+  app.use('/api/admin/course', adminRouter);
 };
 
 /*
