@@ -32,7 +32,7 @@ exports.create = async(req, res) => {
     res.send({success: false, message: "Something went wrong"});
     return; 
   }
-  res.send({success:true, message:"success"})
+  res.send({success:true, message:"success", reply: newReply})
 
   // const user = await User.findOne({where: {id: newReply.userId}});
   // if(!user){
