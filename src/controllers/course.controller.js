@@ -4,12 +4,15 @@ const jwtHelper = require("../lib/jwtHelper");
 
 const Comment = db.comment 
 
+
+const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
+const { S3Client, GetObjectCommand, PutObjectCommand, PutObjectAclCommand, PutObjectAclRequest} = require('@aws-sdk/client-s3');
+const { fromIni } = require('@aws-sdk/credential-provider-ini');
+
 /*
-
-    const client = new S3Client({ region: "ap-northeast-2", credentials: {
-        accessKeyId: "AKIAYZXZIA3N4X5TSNA2", secretAccessKey: "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"}
-    });
-
+  const client = new S3Client({ region: "ap-northeast-2", credentials: {
+      accessKeyId: "AKIAYZXZIA3N4X5TSNA2", secretAccessKey: "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"}
+  });
 */
 
 exports.list = async(req, res) => {
@@ -195,3 +198,34 @@ exports.mycourses = async(req,res) => {
 
   res.send({success: true, mycourses: mycourses})
 }
+
+exports.getUploadableImgUrl = async(req,res) => {
+  const client = new S3Client({ region: "ap-northeast-2", credentials: {
+    accessKeyId: "AKIAYZXZIA3N4X5TSNA2", secretAccessKey: "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"}});
+
+  const uuid = uuidv4();
+  const command = new PutObjectCommand({Bucket: "ringle-document-resource", Key: uuid});
+
+  const url = await getSignedUrl(client, command, {expiresIn: 300}); //300초 인가...?이미지는 삭제할 것인가?
+  res.send({
+    success: true,
+    url: url,
+    uuid: uuid, 
+  });
+}
+
+exports.grantImgPermission = async(req,res) => {
+  const uuid = req.body.uuid;
+  const client = new S3Client({ region: "ap-northeast-2", credentials: {
+    accessKeyId: "AKIAYZXZIA3N4X5TSNA2", secretAccessKey: "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"}});
+
+  const command = new PutObjectAclCommand({Bucket: "ringle-document-resource", Key: uuid,
+    ACL: "public-read"
+  }); //uuid public.. -> 
+
+  const data = await client.send(command);
+  res.send({success: true})
+}
+
+//client upload first.
+
