@@ -26,8 +26,11 @@ exports.list = async(req, res) => {
     return
   }
 
+  console.log('1o298319280391820938');
+  console.log(courses);
+
   if(userId){
-    const userCourses = await db.UserCourse.findAll({where: {userId: userId, courseId: {$in: [4,5]} }})
+    const userCourses = await db.UserCourse.findAll({where: {userId: userId, courseId: courses.map(course => course.id)}})
     const _courses = courses.map(course => {
       userCourse = userCourses.find(userCourse => userCourse.courseId === course.id)    
       course.userCourse = userCourse
@@ -123,6 +126,22 @@ exports.remove = async(req,res) => {
   }
 }
 
+//api/course/drop/5
+exports.drop = async(req, res) => {
+  const decoded = await jwtHelper.decodeHelper(req);
+  const userId = decoded.userId;
+  const courseId = req.params.courseId
+
+  if(!userId){
+    res.send({success: false, message: "not logged in"})
+    return
+  }
+
+  await db.UserCourse.destroy({where: {userId: userId, courseId: courseId}});
+
+  res.send({success: true, message: "deleted"})
+}
+
 exports.apply = async(req, res) => {
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
@@ -134,15 +153,18 @@ exports.apply = async(req, res) => {
 
   const courseId = req.params.courseId
 
-  //이미 있는 경우는>>/
-  const userCourse = await db.UserCourse.create({
+  let userCourse = await db.UserCourse.findOne({where: {
     userId: userId,
-    courseId: courseId, 
-    progress: 0,
-  })
+    courseId: courseId
+  }})
 
-  console.log('102938019283091283');
-  console.log(courseId)
+  if (!userCourse){
+    userCourse = await db.UserCourse.create({
+      userId: userId,
+      courseId: courseId, 
+      progress: 0,
+    })
+  }
 
   res.send({success: true, userCourse: userCourse})
 }
@@ -163,12 +185,12 @@ exports.mycourses = async(req,res) => {
   const userCourses = await db.UserCourse.findAll({raw: true,where: {userId: userId}})
   const courseIds = userCourses.map(x => x.courseId)
   const courses = await db.Course.findAll({raw: true, where: {id: courseIds}})
-
-  console.log(courses); 
+  const userReviews = await db.UserReview.findAll({where: {userId: userId}})
 
   const mycourses = userCourses.map(userCourse => {
     const course = courses.find(course => course.id === userCourse.courseId)
-    return {...course, userCourse: userCourse}
+    const userReview = userReviews.find(userReview => userReview.courseId === userCourse.courseId)
+    return {...course, userCourse: userCourse, userReview: userReview}
   })
 
   res.send({success: true, mycourses: mycourses})

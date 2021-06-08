@@ -20,6 +20,7 @@ module.exports = (sequelize, DataTypes) => {
     difficulty: DataTypes.STRING,
     subtitle: DataTypes.STRING,
     resultImgUrl: DataTypes.STRING,
+    numClips: DataTypes.INTEGER,
   }, {
     sequelize,
     modelName: 'Course',

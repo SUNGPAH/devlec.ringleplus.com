@@ -9,9 +9,12 @@ module.exports = function(app) {
   router.get("/:courseId/qnas", course.qnas)
   router.get("/mycourses", course.mycourses)
   router.post("/apply/:courseId", course.apply)
+  router.post("/drop/:courseId", course.drop)
+  //only admin..
+  router.post("/add", course.add)
   router.post("/modify/:courseId", course.modify)
   router.post("/remove/:courseId", course.remove)
-  router.post("/add", course.add)
+
   app.use('/api/course', router);
 };
 
