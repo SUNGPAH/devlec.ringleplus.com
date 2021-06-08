@@ -4,6 +4,14 @@ const jwtHelper = require("../lib/jwtHelper");
 
 const Comment = db.comment 
 
+/*
+
+    const client = new S3Client({ region: "ap-northeast-2", credentials: {
+        accessKeyId: "AKIAYZXZIA3N4X5TSNA2", secretAccessKey: "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"}
+    });
+
+*/
+
 exports.list = async(req, res) => {
 
   const decoded = await jwtHelper.decodeHelper(req);
