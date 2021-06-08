@@ -14,6 +14,12 @@ module.exports = function(app) {
   router.post("/add", course.add)
   router.post("/modify/:courseId", course.modify)
   router.post("/remove/:courseId", course.remove)
+  router.get("/getUploadableImgUrl", course.getUploadableImgUrl)
+
+  router.post("/grantImgPermission", course.grantImgPermission)
+
+
+  
 
   app.use('/api/course', router);
 };

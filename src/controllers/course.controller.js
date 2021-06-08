@@ -219,7 +219,12 @@ exports.grantImgPermission = async(req,res) => {
   }); //uuid public.. -> 
 
   const data = await client.send(command);
-  res.send({success: true})
+
+  const course = await db.Course.findOne({where:{id: req.body.courseId}})
+  course.imgUrl = `https://ringle-document-resource.s3.ap-northeast-2.amazonaws.com/${uuid}`
+  await course.save()
+
+  res.send({success: true, course: course})
 }
 
 //client upload first.
