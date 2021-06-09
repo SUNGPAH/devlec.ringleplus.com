@@ -7,12 +7,30 @@ exports.decodeHelper = async (req) => {
     ignoreExpiration: true
   }
 
+  console.log('decode helper');
+  console.log(token)
+
+  if (token === undefined || token === "undefined"){
+    return {
+      success: false,
+      userId: null
+    }
+  }
+  if (token === ""){
+    return {
+      success: false,
+      userId: null
+    }
+  }
+
   if (!token){
     return {
       success: false,
       userId: null
     }
   }
+
+  console.log('pass this..??', token);
 
   const verifyPromise = () => new Promise(function(resolve, reject){
     jwt.verify(token, config.secret, options, function(err, decoded){

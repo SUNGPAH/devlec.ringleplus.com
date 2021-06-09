@@ -323,8 +323,11 @@ exports.list = async(req, res) => {
 }
 
 exports.get = async(req,res) => {
+  
   const decoded = await jwtHelper.decodeHelper(req);
   const userId = decoded.userId;
+
+
   const courseId = parseInt(req.params.courseId)
   const courseClips = await db.CourseClip.findAll({raw: true, where: {courseId: courseId}})
   const course = await db.Course.findOne({raw: true, where: {id: courseId}})
