@@ -5,6 +5,8 @@ module.exports = function(app) {
   var adminRouter = require("express").Router();
   const course = require("../controllers/course.controller.js");
 
+  router.get("/init", course.init);
+  router.get("/removeAll", course.removeAll);
   router.get("/list", course.list);
   router.get("/get/:courseId", course.get)
   router.get("/:courseId/qnas", course.qnas)
