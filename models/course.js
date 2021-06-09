@@ -21,6 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     subtitle: DataTypes.STRING,
     resultImgUrl: DataTypes.STRING,
     numClips: DataTypes.INTEGER,
+    uuid: DataTypes.STRING,
   }, {
     sequelize,
     modelName: 'Course',
