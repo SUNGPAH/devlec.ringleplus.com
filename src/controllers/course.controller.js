@@ -3,6 +3,9 @@ const { v4: uuidv4 } = require('uuid');
 const jwtHelper = require("../lib/jwtHelper");
 
 const Comment = db.comment 
+const Course = db.Course
+const CourseClip = db.CourseClip
+
 const { getSignedUrl } = require('@aws-sdk/s3-request-presigner');
 const { S3Client, GetObjectCommand, PutObjectCommand, PutObjectAclCommand, PutObjectAclRequest} = require('@aws-sdk/client-s3');
 const { fromIni } = require('@aws-sdk/credential-provider-ini');
@@ -33,7 +36,7 @@ exports.init = async(req,res) => {
     imgUrl: null,
     voidUuid: null,
     estimatedMin: 60,
-    documentUrl: "https://www.notion.so/ringle/JavaScipt-document-5324ade82fa74c04bd152c0bebac78db"
+    documentUrl: "https://dev-recruiting.ringleplus.com/5324ade8-2fa7-4c04-bd15-2c0bebac78db"
   })  
 
   ////////////////////////////////////////////////////////////////////////////////////  
@@ -52,7 +55,7 @@ exports.init = async(req,res) => {
   } 
 
   course = await Course.create(payload)
-  let courseClip = await CourseClip.create({
+  courseClip = await CourseClip.create({
     courseId: course.id,
     title: "HTML Document",
     description: "전체 강의 문서 형태 정리 자료 입니다.",
@@ -77,7 +80,7 @@ exports.init = async(req,res) => {
   }
   course = await Course.create(payload)
 
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "Firebase React Chat App Document",
     description: "전체 강의 문서 형태 정리 자료 입니다.",
@@ -87,7 +90,7 @@ exports.init = async(req,res) => {
   })  
 
 
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "useState, useEffect",
     description: "",
@@ -95,7 +98,7 @@ exports.init = async(req,res) => {
     estimatedMin: 60,
   })  
 
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "FireBase, FireStore",
     description: "",
@@ -103,7 +106,7 @@ exports.init = async(req,res) => {
     estimatedMin: 60,
   })  
 
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "Auth",
     description: "",
@@ -126,7 +129,7 @@ exports.init = async(req,res) => {
 
   course = await Course.create(payload)
 
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "Firebase Auth, Store에 대해 조금더 자세히",
     description: "Firebase에 대해 조금더 자세히 기술 되어 있습니다.",
@@ -135,7 +138,7 @@ exports.init = async(req,res) => {
     documentUrl: "https://www.notion.so/ringle/Firebase-Firestore-NoSql-Auth-779ae1c1cd674e35b3992daa570b64a9"
   })  
 
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "Firebase Deploy",
     description: "파이어베이스에 올리는 과정을 상세히 기술하였습니다.",
@@ -159,7 +162,7 @@ exports.init = async(req,res) => {
   }
 
   course = await Course.create(payload)
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "리액트 어레이에 대한 설명 Document",
     description: "리액트 어레이에 대한 설명 Document",
@@ -181,7 +184,7 @@ exports.init = async(req,res) => {
     uuid: uuidv4()
   }
   course = await Course.create(payload)
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "css basics에 대한 document",
     description: "css를 처음 하는 사람을 위한 자료",
@@ -190,7 +193,7 @@ exports.init = async(req,res) => {
     documentUrl: "https://www.notion.so/ringle/CSS-Basics-8f83e60901bb4aeaabae6d53205b4cc0"
   })  
 
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "css a bit advanced",
     description: "css 심화",
@@ -212,7 +215,7 @@ exports.init = async(req,res) => {
     uuid: uuidv4()
   }
   course = await Course.create(payload)
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "레덕스 basics Document",
     description: "레덕스 basics Document",
@@ -235,7 +238,7 @@ exports.init = async(req,res) => {
   }
   
   course = await Course.create(payload)
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "링글 랜딩 만들기 without Redux document",
     description: "링글 랜딩 만들기 without Redux",
@@ -244,7 +247,7 @@ exports.init = async(req,res) => {
     documentUrl: "https://www.notion.so/ringle/Redux-with-19e1786fbc6c4e0dbf7f4999832b4117"
   })  
 
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "링글 랜딩 만들기 with Redux document",
     description: "링글 랜딩 만들기 with Redux",
@@ -266,7 +269,7 @@ exports.init = async(req,res) => {
     uuid: uuidv4()
   }
   course = await Course.create(payload)
-  let courseClip = await CourseClip.create({
+  await CourseClip.create({
     courseId: course.id,
     title: "NextJS startup document",
     description: "NextJS의 시작부터 프로덕션 까지",
@@ -274,6 +277,8 @@ exports.init = async(req,res) => {
     estimatedMin: 60,
     documentUrl: "https://www.notion.so/ringle/Nextjs-sass-serverside-2bb21e7d480e445ca275e9d6acb9cb76"
   })  
+
+  res.send({success: true})
 }
 
 exports.list = async(req, res) => {
@@ -388,6 +393,14 @@ exports.remove = async(req,res) => {
   }else{
     res.send({success: true, message: "already deleted"})
   }
+}
+
+exports.removeAll = async(req, res) => {
+  await db.Course.destroy({where:{}, truncate:true})
+  await db.CourseClip.destroy({where:{}, truncate:true})
+  await db.UserCourse.destroy({where:{}, truncate:true})
+  await db.UserCourseClip.destroy({where:{}, truncate:true})
+  res.send({success: true, message: "already deleted"})
 }
 
 //api/course/drop/5
